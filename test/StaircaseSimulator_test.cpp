@@ -8,9 +8,9 @@
 #include "StaircaseSimulator.h"
 #include "gtest/gtest.h"
 
-TEST(stairSim, init) {
+TEST(stairSim, run) {
 	StaircaseSimulator & scs = StaircaseSimulator::GetInstance();
-
+	scs.run(0);
 }
 
 int main(int argc, char **argv) {

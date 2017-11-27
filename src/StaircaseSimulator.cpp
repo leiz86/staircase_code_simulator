@@ -12,10 +12,40 @@ StaircaseSimulator::StaircaseSimulator() {
 }
 
 StaircaseSimulator::~StaircaseSimulator() {
+	if (dm) {
+		delete dm;
+		dm = NULL;
+	}
+	if (ng) {
+		delete ng;
+		ng = NULL;
+	}
+	if (sc) {
+		delete sc;
+		sc = NULL;
+	}
 }
 
 StaircaseSimulator& StaircaseSimulator::GetInstance(void) {
 	static StaircaseSimulator instance;
 	return instance;
+}
+
+int StaircaseSimulator::init(const char *opts) {
+	if(opts == NULL) {
+		printf("SS ERR: init: no options string given!\n");
+		return -1;
+	}
+	if(dm.init(opts) != 0) {
+		printf("SS ERR: init: could not parse options string [%s]!\n", opts);
+		return -1;
+	}
+	ng.init(dm.getNoiseGenerator());
+	sc.init(dm);
+
+}
+
+int StaircaseSimulator::run(int state) {
+
 }
 
