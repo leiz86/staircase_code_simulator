@@ -7,12 +7,14 @@
 
 #include <StaircaseCode.h>
 
-StaircaseCode::StaircaseCode() {
-	// TODO Auto-generated constructor stub
+StaircaseCodeNS::StaircaseCode::StaircaseCode() {
 
 }
 
-StaircaseCode::~StaircaseCode() {
-	// TODO Auto-generated destructor stub
+StaircaseCodeNS::StaircaseCode::~StaircaseCode() {
 }
 
+int StaircaseCodeNS::StaircaseCode::init(DataManager& dm) {
+//	dm.
+	return 0;
+}

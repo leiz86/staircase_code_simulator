@@ -5,6 +5,8 @@
  *      Author: leizhang
  */
 
+#include <cstdio>
+
 #include "StaircaseSimulator.h"
 
 StaircaseSimulator::StaircaseSimulator() {
@@ -36,16 +38,19 @@ int StaircaseSimulator::init(const char *opts) {
 		printf("SS ERR: init: no options string given!\n");
 		return -1;
 	}
-	if(dm.init(opts) != 0) {
+	if(dm->init(opts) != 0) {
 		printf("SS ERR: init: could not parse options string [%s]!\n", opts);
 		return -1;
 	}
-	ng.init(dm.getNoiseGenerator());
-	sc.init(dm);
+
+	ng->init(dm->getNoiseGeneratorType());
+	sc->init(*dm);
+
+	return 0;
 
 }
 
 int StaircaseSimulator::run(int state) {
-
+	return 0;
 }
 

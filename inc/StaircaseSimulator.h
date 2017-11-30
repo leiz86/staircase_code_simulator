@@ -10,10 +10,14 @@
 
 #include <cstddef>
 
+#include "DataManager.h"
+#include "NoiseGenerator.h"
+#include "StaircaseCode.h"
+
 class StaircaseSimulator {
 	DataManager *dm = NULL;
-	NoiseGenerator *ng = NULL;
-	StaircaseCode *sc = NULL;
+	NoiseGeneratorNS::NoiseGenerator *ng = NULL;
+	StaircaseCodeNS::StaircaseCode *sc = NULL;
 
 	// make private, as singleton
 	StaircaseSimulator();

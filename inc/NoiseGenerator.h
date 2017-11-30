@@ -13,7 +13,7 @@ namespace NoiseGeneratorNS {
 typedef enum {
 	NONE = 0,
 	BERN,
-	GEO
+	GEOM
 } Type;
 
 class NoiseGenerator {
@@ -21,6 +21,20 @@ class NoiseGenerator {
 public:
 	NoiseGenerator();
 	~NoiseGenerator();
+
+	/*
+	 * function initializes noise genereator
+	 * of given type
+	 *
+	 * input:
+	 * noise generator type
+	 *
+	 * return:
+	 * 0, success
+	 * -1, otherwise
+	 *
+	 */
+	int init(Type t);
 };
 
 } /* NoiseGeneratorNS namespace */

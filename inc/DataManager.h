@@ -8,13 +8,13 @@
 #ifndef INC_DATAMANAGER_H_
 #define INC_DATAMANAGER_H_
 
-#include "StaircaseCode.h"
+#include "ParamStructures.h"
 #include "NoiseGenerator.h"
 
 class DataManager {
 	NoiseGeneratorNS::Type ngType;
-//	ComponentCodeNS::ComponentCodeParams ccParams;
-
+	ComponentCodeNS::Params ccParams;
+	StaircaseCodeNS::Params scParams;
 
 public:
 	DataManager();
@@ -35,6 +35,14 @@ public:
 
 	NoiseGeneratorNS::Type getNoiseGeneratorType(void) {
 		return ngType;
+	}
+
+	ComponentCodeNS::Params getComponentCodeParams(void) {
+		return ccParams;
+	}
+
+	StaircaseCodeNS::Params getStaircaseCodeParams(void) {
+		return scParams;
 	}
 };
 
