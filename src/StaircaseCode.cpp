@@ -7,14 +7,29 @@
 
 #include <StaircaseCode.h>
 
-StaircaseCodeNS::StaircaseCode::StaircaseCode() {
+using namespace StaircaseCodeNS;
+
+StaircaseCode::StaircaseCode() {
 
 }
 
-StaircaseCodeNS::StaircaseCode::~StaircaseCode() {
+StaircaseCode::~StaircaseCode() {
+	if(scBlocks != NULL) {
+		delete[] scBlocks;
+		scBlocks = NULL;
+	}
+	nScBlocks = 0;
 }
 
-int StaircaseCodeNS::StaircaseCode::init(DataManager& dm) {
-//	dm.
-	return 0;
+void StaircaseCode::init(DataManager& dm) {
+	Params &params = dm.getStaircaseCodeParams();
+	createBlocks(params.nBlocks, params.width);
+	maxIters = params.maxIters;
+}
+
+void StaircaseCode::createBlocks(const int _nBlocks, const int _width) {
+	scBlocks = new Block[_nBlocks];
+	// todo: use the _width parameter to set each block
+
+	nScBlocks = _nBlocks;
 }

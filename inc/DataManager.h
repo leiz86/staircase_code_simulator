@@ -37,11 +37,11 @@ public:
 		return ngType;
 	}
 
-	ComponentCodeNS::Params getComponentCodeParams(void) {
+	ComponentCodeNS::Params &getComponentCodeParams(void) {
 		return ccParams;
 	}
 
-	StaircaseCodeNS::Params getStaircaseCodeParams(void) {
+	StaircaseCodeNS::Params &getStaircaseCodeParams(void) {
 		return scParams;
 	}
 };
