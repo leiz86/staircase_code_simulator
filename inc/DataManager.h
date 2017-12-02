@@ -33,15 +33,15 @@ public:
 	 */
 	int init(const char *opts);
 
-	NoiseGeneratorNS::Type getNoiseGeneratorType(void) {
+	NoiseGeneratorNS::Type getNoiseGeneratorType(void) const {
 		return ngType;
 	}
 
-	ComponentCodeNS::Params &getComponentCodeParams(void) {
+	const ComponentCodeNS::Params &getComponentCodeParams(void) const {
 		return ccParams;
 	}
 
-	StaircaseCodeNS::Params &getStaircaseCodeParams(void) {
+	const StaircaseCodeNS::Params &getStaircaseCodeParams(void) const {
 		return scParams;
 	}
 };

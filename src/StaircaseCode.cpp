@@ -14,22 +14,18 @@ StaircaseCode::StaircaseCode() {
 }
 
 StaircaseCode::~StaircaseCode() {
-	if(scBlocks != NULL) {
-		delete[] scBlocks;
-		scBlocks = NULL;
+	if(blocks != NULL) {
+		delete[] blocks;
+		blocks = NULL;
 	}
-	nScBlocks = 0;
 }
 
-void StaircaseCode::init(DataManager& dm) {
-	Params &params = dm.getStaircaseCodeParams();
-	createBlocks(params.nBlocks, params.width);
-	maxIters = params.maxIters;
+void StaircaseCode::init(const DataManager& dm) {
+	params = dm.getStaircaseCodeParams();
+	initBlocks();
 }
 
-void StaircaseCode::createBlocks(const int _nBlocks, const int _width) {
-	scBlocks = new Block[_nBlocks];
-	// todo: use the _width parameter to set each block
+void StaircaseCode::initBlocks(void) {
+	blocks = new Block[params.nBlocks];
 
-	nScBlocks = _nBlocks;
 }

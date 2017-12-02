@@ -10,6 +10,10 @@
 
 TEST(stairSim, run) {
 	StaircaseSimulator & scs = StaircaseSimulator::GetInstance();
+
+	const char testOpts[] = "test";
+	scs.init(testOpts);
+
 	scs.run(0);
 }
 

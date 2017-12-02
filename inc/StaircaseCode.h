@@ -21,11 +21,10 @@ class Block {
 
 class StaircaseCode {
 
-	Block *scBlocks = NULL;
-	int nScBlocks = 0;
+	StaircaseCodeNS::Params params;
+	Block *blocks = NULL;
 
-	int maxIters = 0;
-	void createBlocks(const int, const int);
+	void initBlocks(void);
 
 public:
 	StaircaseCode();
@@ -35,7 +34,7 @@ public:
 	 * function initializes staircase code
 	 *
 	 */
-	void init(DataManager & dm);
+	void init(const DataManager & dm);
 };
 
 } /* StaircaseCodeNS */

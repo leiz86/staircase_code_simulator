@@ -9,6 +9,8 @@
 #define INC_PARAMSTRUCTURES_H_
 
 #include <cstdint>
+#include <cstdio>
+#include <string>
 
 namespace ComponentCodeNS {
 
@@ -64,6 +66,8 @@ struct Params {
 	 *
 	 */
 	int populateParams(void);
+
+	std::string ToString(void);
 
 };
 

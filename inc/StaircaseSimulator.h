@@ -15,9 +15,9 @@
 #include "StaircaseCode.h"
 
 class StaircaseSimulator {
-	DataManager *dm = NULL;
-	NoiseGeneratorNS::NoiseGenerator *ng = NULL;
-	StaircaseCodeNS::StaircaseCode *sc = NULL;
+	DataManager dm;
+	NoiseGeneratorNS::NoiseGenerator ng;
+	StaircaseCodeNS::StaircaseCode sc;
 
 	// make private, as singleton
 	StaircaseSimulator();
