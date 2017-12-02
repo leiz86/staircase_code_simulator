@@ -38,7 +38,49 @@ int StaircaseSimulator::init(const char *opts) {
 
 }
 
+static std::vector<double> getChannelParameters(double m, double M, double s) {
+	std::vector<double> pArray;
+	double p = m;
+	while (p < M + s) {	// to avoid numerical inaccuracy around M and losing M
+		pArray.push_back(p);
+		p += s;
+	}
+	return pArray;
+}
+
 int StaircaseSimulator::run(int state) {
+	const Params &sp = dm.getSimulationParams();
+	std::vector<double> p = getChannelParameters(sp.pMin, sp.pMax, sp.pStep);
+//	printf("p array[");	// debugging
+//	for(int i = 0; i < (int)p.size(); i++) {printf("%1.4f ", p[i]);}	// debugging
+//	printf("] (%lu entries)\n", p.size());	// debugging
+
+	std::vector<double> ber;
+	std::vector<double> bker;
+	for(double _p : p) {
+		double _ber, _bker;
+//		runAtChannel(_p, _ber, _bker);
+		ber.push_back(_ber);
+		bker.push_back(_bker);
+	}
+
 	return 0;
+}
+
+/*
+ * function runs simulation at given channel parameter
+ *
+ * outputs:
+ * ber, average bit error
+ * bker, average block error
+ *
+ */
+void StaircaseSimulator::runAtChannel(double p, double &ber, double &bker) {
+	while(!sc.isConverged()) {
+
+	}
+
+	ber = sc.getBER();
+	bker = sc.getBKER();
 }
 

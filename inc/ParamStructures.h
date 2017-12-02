@@ -79,12 +79,18 @@ struct Params {
 	int width;
 	int nBlocks;
 	int maxIters;
+
+	uint32_t nBlockBits;
+	uint32_t nTotalBits;
+
 	bool isValid = false;
 
 	Params() :
 		width(0),
 		nBlocks(0),
-		maxIters(0) {
+		maxIters(0),
+		nBlockBits(0),
+		nTotalBits(0) {
 	}
 
 	Params(const int _w, const int _nb, const int _mi) :
@@ -92,11 +98,39 @@ struct Params {
 		nBlocks(_nb),
 		maxIters(_mi){
 		isValid = validateParams();
+		nBlockBits = width * width;
+		nTotalBits = nBlockBits * nBlocks;
 	}
 
 	bool validateParams(void);
 };
 
 }
+
+/* simulation parameters */
+struct Params {
+	double pMin;
+	double pMax;
+	double pStep;
+	int blocksMin;
+	int blocksMax;
+
+	Params() :
+		pMin(0.0),
+		pMax(0.0),
+		pStep(0.1),
+		blocksMin(0),
+		blocksMax(0) {
+	}
+
+	Params(double _pMin, double _pMax, double _pStep, int _blocksMin, int _blocksMax) :
+		pMin(_pMin),
+		pMax(_pMax),
+		pStep(_pStep),
+		blocksMin(_blocksMin),
+		blocksMax(_blocksMax) {
+
+	}
+};
 
 #endif /* INC_PARAMSTRUCTURES_H_ */

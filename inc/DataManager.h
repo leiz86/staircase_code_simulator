@@ -12,9 +12,10 @@
 #include "NoiseGenerator.h"
 
 class DataManager {
-	NoiseGeneratorNS::Type ngType;
+	NoiseGeneratorNS::Type ngType = NoiseGeneratorNS::NONE;
 	ComponentCodeNS::Params ccParams;
 	StaircaseCodeNS::Params scParams;
+	Params simParams;
 
 public:
 	DataManager();
@@ -43,6 +44,10 @@ public:
 
 	const StaircaseCodeNS::Params &getStaircaseCodeParams(void) const {
 		return scParams;
+	}
+
+	const Params &getSimulationParams(void) const {
+		return simParams;
 	}
 };
 

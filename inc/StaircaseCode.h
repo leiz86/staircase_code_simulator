@@ -9,20 +9,29 @@
 #define INC_STAIRCASECODE_H_
 
 #include <cstddef>
+#include <map>
+#include <vector>
 
 #include "ComponentCode.h"
 #include "DataManager.h"
 
 namespace StaircaseCodeNS {
 
-class Block {
-	// todo: define contents here!!!
+struct Block {
+	std::map<int, std::vector<int>> rowErrPos;	// row error positions
+	std::map<int, std::vector<int>> colErrPos;	// column error positions
+
+
 };
 
 class StaircaseCode {
-
 	StaircaseCodeNS::Params params;
 	Block *blocks = NULL;
+
+	double ber;
+	double bker;
+
+	bool converged = false;
 
 	void initBlocks(void);
 
@@ -35,6 +44,18 @@ public:
 	 *
 	 */
 	void init(const DataManager & dm);
+
+	const bool isConverged(void) const {
+		return converged;
+	}
+
+	double getBER(void) const {
+		return ber;
+	}
+
+	double getBKER(void) const {
+		return bker;
+	}
 };
 
 } /* StaircaseCodeNS */
