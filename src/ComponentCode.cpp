@@ -6,3 +6,9 @@
  */
 
 #include "ComponentCode.h"
+
+ComponentCodeNS::ComponentCode::ComponentCode() {
+}
+
+ComponentCodeNS::ComponentCode::~ComponentCode() {
+}

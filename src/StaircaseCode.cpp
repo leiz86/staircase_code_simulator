@@ -5,6 +5,9 @@
  *      Author: leizhang
  */
 
+#include <algorithm>
+#include <cassert>
+
 #include "StaircaseCode.h"
 
 using namespace StaircaseCodeNS;
@@ -31,6 +34,10 @@ void StaircaseCode::initBlocks(void) {
 			blocks[i].colErrPos.push_back(std::vector<int>());
 		}
 	}
+}
+
+static inline bool isDecodeRows(const int ind) {
+	return (ind % 2) == 0;
 }
 
 void StaircaseCodeNS::StaircaseCode::firstIteration(
@@ -82,9 +89,11 @@ void StaircaseCodeNS::StaircaseCode::nextIteration(
 	// (clearly the last 2 functions can be combined)
 }
 
+static std::vector<int> emptyVec;
+
 void StaircaseCodeNS::StaircaseCode::decode(void) {
 	for (int iter = 0; iter < params.maxIters; iter++) {
-		// decode blocks from oldest to newest
+		// decode blocks [0, .., params.nBlocks - 2]
 		for (int blkInd = 0; blkInd < (int) params.nBlocks - 1; blkInd++) {
 			for (int codeInd = 0; codeInd < (int) params.width; codeInd++) {
 				// get error positions on left and right of component code
@@ -94,18 +103,17 @@ void StaircaseCodeNS::StaircaseCode::decode(void) {
 
 				uint16_t nErrors = 0;
 				nErrors = left.size() + right.size();
-				if(nErrors <= cc.params.t) {
-					// no need to call decoder, remove errors
-					removeErrors();
-					// todo: start here
+				if(nErrors <= cc.getParams().t) {
+					// guaranteed correction, remove all errors
+					updateErrors(blkInd, codeInd, left, emptyVec, isDecodeRows(blkInd));
+					updateErrors(blkInd + 1, codeInd, right, emptyVec, isDecodeRows(blkInd));
 				} else {
 					// call decoder
 
-					// add errors
 
-					// remove errors
-					removeErrors();
-
+					// update (remove or add) errors
+					updateErrors(blkInd, codeInd, left, emptyVec, isDecodeRows(blkInd));
+					updateErrors(blkInd + 1, codeInd, right, emptyVec, isDecodeRows(blkInd));
 				}
 			} /* codes loop */
 		} /* blocks loop */
@@ -116,21 +124,97 @@ void StaircaseCodeNS::StaircaseCode::decode(void) {
 }
 
 std::vector<int> & StaircaseCodeNS::StaircaseCode::getLeftErrorVector(int blkInd, int codeInd) {
-	if ((blkInd % 2) == 0) {
-		// rows first
+	if (isDecodeRows(blkInd)) {
 		return blocks[blkInd].rowErrPos[codeInd];
 	} else {
-		// columns first
 		return blocks[blkInd].colErrPos[codeInd];
 	}
 }
 
 std::vector<int> & StaircaseCodeNS::StaircaseCode::getRightErrorVector(int blkInd, int codeInd) {
-	if ((blkInd % 2) == 0) {
-		// rows first
-		return blocks[blkInd + 1].colErrPos[codeInd];
+	if (isDecodeRows(blkInd)) {
+		return blocks[blkInd + 1].rowErrPos[codeInd];
 	} else {
 		// columns first
-		return blocks[blkInd + 1].rowErrPos[codeInd];
+		return blocks[blkInd + 1].colErrPos[codeInd];
+	}
+}
+
+/*
+ * function updates block from vecOld to vecNew
+ *
+ * inputs:
+ * blkInd, index of left block
+ * codeInd, index of component code to update
+ * vecOld, ref to error array before decoding
+ * vecNew, ref to error array after decoding
+ *
+ * note:
+ * updates are done by references to both
+ * row and column error vectors in blocks,
+ * i.e., nothing is copied, careful with remove and erase
+ *
+ *
+ */
+
+void StaircaseCodeNS::StaircaseCode::updateErrors(const int blkInd, const int codeInd,
+		std::vector<int>& vecOld, std::vector<int>& vecNew, bool decodeRows) {
+	if (blkInd < 0 || blkInd >= (params.nBlocks - 1) || codeInd < 0
+			|| codeInd >= params.width) {
+		// wrong indices
+		printf("SC ERR: update errors: wrong indices given %d, %d\n", blkInd, codeInd);
+		return;
+	}
+
+	// remove errors from old, if any
+	for(auto iterOld = vecOld.begin(); iterOld != vecOld.end(); ) {
+		auto iterNew = std::find(vecNew.begin(), vecNew.end(), *iterOld);
+		if(iterNew == vecOld.end()) {
+			// old error is not found in new, remove it
+			removeErrorFromBlock(blkInd, codeInd, *iterOld, decodeRows);
+			iterOld = vecOld.erase(iterOld);
+		} else {
+			// old error is in new, remove it from new to save redundant search
+			vecNew.erase(iterNew);
+			++iterOld;
+		}
+	}
+
+	// add new errors, if any
+	for(auto iterNew = vecNew.begin(); iterNew != vecNew.end(); ) {
+		addErrorToBlock(blkInd, codeInd, *iterNew, decodeRows);
+		vecOld.push_back(*iterNew);
+		vecNew.erase(iterNew);
+	}
+
+}
+
+void StaircaseCodeNS::StaircaseCode::removeErrorFromBlock(const int blkInd,
+		const int codeInd, const int e, bool decodeRows) {
+	if (decodeRows) {
+		// remove column errors
+		int i = codeInd;
+		int j = e;
+		std::vector<int> &vec = blocks[blkInd].colErrPos[j];
+		auto iter = std::remove(vec.begin(), vec.end(), i);
+		assert(iter != vec.end());	// debug
+		vec.erase(iter, vec.end());
+	} else {
+		// remove row errors
+		int i = e;
+		int j = codeInd;
+		std::vector<int> &vec = blocks[blkInd].rowErrPos[i];
+		auto iter = std::remove(vec.begin(), vec.end(), j);
+		assert(iter != vec.end());	// debug
+		vec.erase(iter, vec.end());
+	}
+}
+
+void StaircaseCodeNS::StaircaseCode::addErrorToBlock(const int blkInd,
+		const int codeInd, const int e, bool decodeRows) {
+	if (decodeRows) {
+		blocks[blkInd].rowErrPos[codeInd].push_back(e);
+	} else {
+		blocks[blkInd].colErrPos[codeInd].push_back(e);
 	}
 }

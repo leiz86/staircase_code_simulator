@@ -15,13 +15,17 @@ namespace ComponentCodeNS {
 class ComponentCode {
 	Params params;
 
-	// todo: populate members, need params, decoder, what else??
+	// todo: add decoder
 public:
 	ComponentCode();
 	~ComponentCode();
 
 	void setParams(const Params &_params) {
 		params = _params;
+	}
+
+	const Params &getParams(void) const {
+		return params;
 	}
 };
 

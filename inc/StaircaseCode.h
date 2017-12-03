@@ -57,9 +57,12 @@ class StaircaseCode {
 
 	void initBlocks(void);
 	void decode(void);
-	std::vector<int> & StaircaseCodeNS::StaircaseCode::getLeftErrorVector(int, int);
-	std::vector<int> & StaircaseCodeNS::StaircaseCode::getRightErrorVector(int, int);
-
+	std::vector<int> & getLeftErrorVector(int, int);
+	std::vector<int> & getRightErrorVector(int, int);
+	void updateErrors(const int blkInd, const int codeInd,
+			std::vector<int> &, std::vector<int> &, bool);
+	void removeErrorFromBlock(const int, const int, const int, bool);
+	void addErrorToBlock(const int, const int, const int, bool);
 
 public:
 	StaircaseCode();
