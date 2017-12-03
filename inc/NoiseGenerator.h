@@ -23,6 +23,7 @@ typedef enum {
 class NoiseGenerator {
 	std::mt19937 *mt;
 	Type type;
+	double p;
 
 public:
 	NoiseGenerator();
@@ -45,18 +46,21 @@ public:
 	 * function generates binary noise samples
 	 *
 	 * input:
-	 * p, Bern param
 	 * nSamples, number of samples of noise to generate
 	 *
 	 * output:
 	 * locs, locations within [0, .., nSamples -1] where the noise value is 1
 	 *
-	 * return:
-	 * 0, success
-	 * -1, error
-	 *
 	 */
-	int generate(double p, uint32_t nSamples, std::vector<uint32_t> &locs);
+	void generate(uint32_t nSamples, std::vector<uint32_t> &locs) const;
+
+	int setChannelParam(double _p) {
+		if(_p < 0.0 || _p > 1.0) {
+			return -1;
+		}
+		p = _p;
+		return 0;
+	}
 
 };
 

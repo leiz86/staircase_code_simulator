@@ -133,4 +133,16 @@ struct Params {
 	}
 };
 
+/* simulation results */
+struct Results {
+	double ber;
+	double bker;
+
+	Results() :
+		ber(0.0),
+		bker(0.0) {
+
+	}
+};
+
 #endif /* INC_PARAMSTRUCTURES_H_ */

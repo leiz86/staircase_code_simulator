@@ -8,6 +8,7 @@
 #include <cstdio>
 
 #include "StaircaseSimulator.h"
+#include "ParamStructures.h"
 
 StaircaseSimulator::StaircaseSimulator() {
 
@@ -59,7 +60,7 @@ int StaircaseSimulator::run(int state) {
 	std::vector<double> bker;
 	for(double _p : p) {
 		double _ber, _bker;
-//		runAtChannel(_p, _ber, _bker);
+		runAtChannel(_p, _ber, _bker);
 		ber.push_back(_ber);
 		bker.push_back(_bker);
 	}
@@ -76,11 +77,31 @@ int StaircaseSimulator::run(int state) {
  *
  */
 void StaircaseSimulator::runAtChannel(double p, double &ber, double &bker) {
-	while(!sc.isConverged()) {
+	// set noise generator
+	ng.setChannelParam(p);
 
+	// first generation
+	sc.firstIteration(ng);
+
+	// next iterations
+	while(!sc.isConverged()) {
+		sc.nextIteration(ng);
 	}
 
-	ber = sc.getBER();
-	bker = sc.getBKER();
+	// set results
+	dm.setResults(sc.getBER(), sc.getBKER());
 }
 
+int StaircaseSimulator::report(int type) {
+	const Results &r = dm.getResults();
+	if(type == 0) {
+		printf("----- simulation results -----\n");
+		printf("BER:\t %02.4e\n", r.ber);
+		printf("BKER:\t %02.4e\n", r.bker);
+		printf("----- end simulation results -----\n");
+	} else if (type == 1) {
+		// todo: save report to file
+	}
+
+	return 0;
+}

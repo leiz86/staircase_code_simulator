@@ -47,17 +47,33 @@ public:
 	 * function runs staircase simulator
 	 *
 	 * inputs:
-	 * state, select run state, can be:
+	 * type, select run type:
 	 * 	0, run until converged
 	 * 	1, run 1 iteration (testing)
-	 * 	2, ... and above are not currently used
+	 *  >=2, reserved for future use
 	 *
 	 * return:
 	 * 0, success
 	 * -1, error
 	 *
 	 */
-	int run(int state);
+	int run(int type);
+
+	/*
+	 * function reports simulation results
+	 *
+	 * input:
+	 * type, select report type:
+	 * 0, print
+	 * 1, save to file
+	 * >=2, reserved for future use
+	 *
+	 * return:
+	 * 0, success
+	 * -1, error, e.g., file IO error
+	 *
+	 */
+	int report(int type);
 };
 
 #endif /* STAIRCASESIMULATOR_H_ */

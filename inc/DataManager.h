@@ -16,6 +16,7 @@ class DataManager {
 	ComponentCodeNS::Params ccParams;
 	StaircaseCodeNS::Params scParams;
 	Params simParams;
+	Results results;
 
 public:
 	DataManager();
@@ -48,6 +49,15 @@ public:
 
 	const Params &getSimulationParams(void) const {
 		return simParams;
+	}
+
+	void setResults(double _ber, double _bker) {
+		results.ber = _ber;
+		results.bker = _bker;
+	}
+
+	const Results &getResults(void) const {
+		return results;
 	}
 };
 

@@ -15,8 +15,10 @@ TEST(stairSim, run) {
 	scs.init(testOpts);
 
 	scs.run(0);
+	scs.report(0);
 }
 
+// todo: set up test cases for codes with different parameters and verify results (within tolerance)
 
 
 int main(int argc, char **argv) {

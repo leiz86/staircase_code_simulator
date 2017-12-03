@@ -13,7 +13,7 @@
 using namespace NoiseGeneratorNS;
 
 NoiseGenerator::NoiseGenerator() :
-	type(NONE) {
+	type(NONE), p(0.0) {
 	mt = new std::mt19937(time(NULL));
 }
 
@@ -29,10 +29,9 @@ int NoiseGeneratorNS::NoiseGenerator::init(Type t) {
 	return 0;
 }
 
-int NoiseGeneratorNS::NoiseGenerator::generate(double p, uint32_t nSamples, std::vector<uint32_t> &locs) {
-	if (nSamples == 0 ||
-		p < 0.0) {
-		return -1;
+void NoiseGeneratorNS::NoiseGenerator::generate(uint32_t nSamples, std::vector<uint32_t> &locs) const {
+	if (nSamples == 0) {
+		return;
 	}
 
 	std::bernoulli_distribution randVar(p);
@@ -41,5 +40,15 @@ int NoiseGeneratorNS::NoiseGenerator::generate(double p, uint32_t nSamples, std:
 			locs.push_back(i);
 		}
 	}
-	return 0;
+
+	printf("----- noise -----\n");	// debug
+	for (int i = 0; i < (int) locs.size(); i++) {
+		printf("%04u ", locs[i]);
+		if (((i + 1) % 10) == 0) {
+			printf("\n");
+		}
+	}
+	printf("\n");
+	printf("----- end noise -----\n");
+
 }
