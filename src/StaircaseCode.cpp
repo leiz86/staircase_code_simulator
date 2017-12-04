@@ -69,6 +69,10 @@ void StaircaseCodeNS::StaircaseCode::firstIteration(
 	// decode
 	decode();
 
+	for(int i = 0; i < params.nBlocks; i++) {
+		printf("----- block %d -----\n", i);
+		blocks[i].print();	// debug
+	}
 
 	// tabulate errors
 
@@ -107,14 +111,18 @@ void StaircaseCodeNS::StaircaseCode::decode(void) {
 					// guaranteed correction, remove all errors
 					updateErrors(blkInd, codeInd, left, emptyVec, isDecodeRows(blkInd));
 					updateErrors(blkInd + 1, codeInd, right, emptyVec, isDecodeRows(blkInd));
-				} else {
-					// call decoder
-
-
-					// update (remove or add) errors
-					updateErrors(blkInd, codeInd, left, emptyVec, isDecodeRows(blkInd));
-					updateErrors(blkInd + 1, codeInd, right, emptyVec, isDecodeRows(blkInd));
 				}
+				// todo: use syndrome decoder
+//				else {
+//					// call decoder
+//
+//
+//					std::vector<int> leftNew;
+//					std::vector<int> rightNew;
+//					// update (remove or add) errors
+//					updateErrors(blkInd, codeInd, left, leftNew, isDecodeRows(blkInd));
+//					updateErrors(blkInd + 1, codeInd, right, rightNew, isDecodeRows(blkInd));
+//				}
 			} /* codes loop */
 		} /* blocks loop */
 
@@ -156,20 +164,25 @@ std::vector<int> & StaircaseCodeNS::StaircaseCode::getRightErrorVector(int blkIn
  *
  *
  */
-
-void StaircaseCodeNS::StaircaseCode::updateErrors(const int blkInd, const int codeInd,
-		std::vector<int>& vecOld, std::vector<int>& vecNew, bool decodeRows) {
-	if (blkInd < 0 || blkInd >= (params.nBlocks - 1) || codeInd < 0
+void StaircaseCodeNS::StaircaseCode::updateErrors(const int blkInd,
+		const int codeInd, std::vector<int>& vecOld, std::vector<int>& vecNew,
+		bool decodeRows) {
+//	printf(
+//			"inside update errors, blk %d, code %d, row/col %d, old len %lu, new len %lu\n",
+//			blkInd, codeInd, decodeRows, vecOld.size(), vecNew.size());
+	if (blkInd < 0 || blkInd > (params.nBlocks - 1) || codeInd < 0
 			|| codeInd >= params.width) {
 		// wrong indices
-		printf("SC ERR: update errors: wrong indices given %d, %d\n", blkInd, codeInd);
+		printf(
+				"SC ERR: update errors: wrong indices given blk %d (max %d), code %d (max %d)\n",
+				blkInd, params.nBlocks, codeInd, params.width);
 		return;
 	}
 
 	// remove errors from old, if any
-	for(auto iterOld = vecOld.begin(); iterOld != vecOld.end(); ) {
+	for (auto iterOld = vecOld.begin(); iterOld != vecOld.end();) {
 		auto iterNew = std::find(vecNew.begin(), vecNew.end(), *iterOld);
-		if(iterNew == vecOld.end()) {
+		if (iterNew == vecNew.end()) {
 			// old error is not found in new, remove it
 			removeErrorFromBlock(blkInd, codeInd, *iterOld, decodeRows);
 			iterOld = vecOld.erase(iterOld);
@@ -181,16 +194,19 @@ void StaircaseCodeNS::StaircaseCode::updateErrors(const int blkInd, const int co
 	}
 
 	// add new errors, if any
-	for(auto iterNew = vecNew.begin(); iterNew != vecNew.end(); ) {
+	for (auto iterNew = vecNew.begin(); iterNew != vecNew.end();) {
 		addErrorToBlock(blkInd, codeInd, *iterNew, decodeRows);
 		vecOld.push_back(*iterNew);
 		vecNew.erase(iterNew);
 	}
-
+//	printf(
+//			"leaving update errors, blk %d, code %d, row/col %d, old len %lu, new len %lu\n",
+//			blkInd, codeInd, decodeRows, vecOld.size(), vecNew.size());
 }
 
 void StaircaseCodeNS::StaircaseCode::removeErrorFromBlock(const int blkInd,
 		const int codeInd, const int e, bool decodeRows) {
+//	printf("inside remove error, %d %d %d %d\n", blkInd, codeInd, e, decodeRows);
 	if (decodeRows) {
 		// remove column errors
 		int i = codeInd;
@@ -208,13 +224,16 @@ void StaircaseCodeNS::StaircaseCode::removeErrorFromBlock(const int blkInd,
 		assert(iter != vec.end());	// debug
 		vec.erase(iter, vec.end());
 	}
+//	printf("leaving remove error\n");
 }
 
 void StaircaseCodeNS::StaircaseCode::addErrorToBlock(const int blkInd,
 		const int codeInd, const int e, bool decodeRows) {
+//	printf("inside add error, %d %d %d %d\n", blkInd, codeInd, e, decodeRows);
 	if (decodeRows) {
 		blocks[blkInd].rowErrPos[codeInd].push_back(e);
 	} else {
 		blocks[blkInd].colErrPos[codeInd].push_back(e);
 	}
+//	printf("leaving add error\n");
 }
