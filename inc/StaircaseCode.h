@@ -47,8 +47,13 @@ struct Block {
 
 class StaircaseCode {
 	Params params;
+	SimulationNS::Params simParams;
 	ComponentCodeNS::ComponentCode cc;
 	std::deque<Block> blocks;
+
+	uint64_t nBlocksDecoded = 0;
+	uint32_t nBitErrors = 0;
+	uint32_t nBlockErrors = 0;
 
 	double ber;
 	double bker;
@@ -56,7 +61,11 @@ class StaircaseCode {
 	bool converged = false;
 
 	void initBlocks(void);
+	void resetErrorCounters(void);
+	void countErrors(void);
+	void updateConverged(void);
 	void decode(void);
+	void incrementBlocksDecoded(void);
 	std::vector<int> & getLeftErrorVector(int, int);
 	std::vector<int> & getRightErrorVector(int, int);
 	void updateErrors(const int blkInd, const int codeInd,
@@ -82,7 +91,7 @@ public:
 	 * ng, reference to pre-set noise generator
 	 *
 	 */
-	void firstIteration(const NoiseGeneratorNS::NoiseGenerator &ng);
+	void firstBlocks(const NoiseGeneratorNS::NoiseGenerator &ng);
 
 	/*
 	 * function performs a subsequent iteration
@@ -92,7 +101,7 @@ public:
 	 * ng, reference to pre-set noise generator
 	 *
 	 */
-	void nextIteration(const NoiseGeneratorNS::NoiseGenerator &ng);
+	void nextBlock(const NoiseGeneratorNS::NoiseGenerator &ng);
 
 	const bool isConverged(void) const {
 		return converged;

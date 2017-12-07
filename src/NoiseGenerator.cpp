@@ -41,14 +41,14 @@ void NoiseGeneratorNS::NoiseGenerator::generate(uint32_t nSamples, std::vector<u
 		}
 	}
 
-	printf("----- noise -----\n");	// debug
-	for (int i = 0; i < (int) locs.size(); i++) {
-		printf("%04u ", locs[i]);
-		if (((i + 1) % 10) == 0) {
-			printf("\n");
-		}
-	}
-	printf("\n");
-	printf("----- end noise -----\n");
+//	printf("----- noise -----\n");	// debug
+//	for (int i = 0; i < (int) locs.size(); i++) {
+//		printf("%04u ", locs[i]);
+//		if (((i + 1) % 10) == 0) {
+//			printf("\n");
+//		}
+//	}
+//	printf("\n");
+//	printf("----- end noise -----\n");
 
 }

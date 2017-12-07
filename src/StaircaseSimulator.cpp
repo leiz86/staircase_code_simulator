@@ -50,7 +50,7 @@ static std::vector<double> getChannelParameters(double m, double M, double s) {
 }
 
 int StaircaseSimulator::run(int state) {
-	const Params &sp = dm.getSimulationParams();
+	const SimulationNS::Params &sp = dm.getSimulationParams();
 	std::vector<double> p = getChannelParameters(sp.pMin, sp.pMax, sp.pStep);
 //	printf("p array[");	// debugging
 //	for(int i = 0; i < (int)p.size(); i++) {printf("%1.4f ", p[i]);}	// debugging
@@ -80,12 +80,12 @@ void StaircaseSimulator::runAtChannel(double p, double &ber, double &bker) {
 	// set noise generator
 	ng.setChannelParam(p);
 
-	// first generation
-	sc.firstIteration(ng);
+	// first blocks
+	sc.firstBlocks(ng);
 
 	// next iterations
 	while(!sc.isConverged()) {
-		sc.nextIteration(ng);
+		sc.nextBlock(ng);
 	}
 
 	// set results
@@ -93,7 +93,7 @@ void StaircaseSimulator::runAtChannel(double p, double &ber, double &bker) {
 }
 
 int StaircaseSimulator::report(int type) {
-	const Results &r = dm.getResults();
+	const SimulationNS::Results &r = dm.getResults();
 	if(type == 0) {
 		printf("----- simulation results -----\n");
 		printf("BER:\t %02.4e\n", r.ber);

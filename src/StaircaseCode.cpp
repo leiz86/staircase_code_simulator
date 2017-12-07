@@ -22,6 +22,7 @@ StaircaseCode::~StaircaseCode() {
 
 void StaircaseCode::init(const DataManager& dm) {
 	params = dm.getStaircaseCodeParams();
+	simParams = dm.getSimulationParams();
 	cc.setParams(dm.getComponentCodeParams());
 	initBlocks();
 }
@@ -40,8 +41,11 @@ static inline bool isDecodeRows(const int ind) {
 	return (ind % 2) == 0;
 }
 
-void StaircaseCodeNS::StaircaseCode::firstIteration(
+void StaircaseCodeNS::StaircaseCode::firstBlocks(
 		const NoiseGeneratorNS::NoiseGenerator& ng) {
+	// reset counters at new channel parameter
+	resetErrorCounters();
+
 	// sample noise
 	uint32_t nSamples = params.nTotalBits - params.nBlockBits;	// all except first block, which is not transmitted
 	std::vector<uint32_t> noise;
@@ -61,40 +65,99 @@ void StaircaseCodeNS::StaircaseCode::firstIteration(
 		blocks[blockInd].colErrPos[colInd].push_back(rowInd);
 	}
 
-	for(int i = 0; i < params.nBlocks; i++) {
-		printf("----- block %d -----\n", i);
-		blocks[i].print();	// debug
-	}
+//	for(int i = 0; i < params.nBlocks; i++) {
+//		printf("----- block %d -----\n", i);
+//		blocks[i].print();	// debug
+//	}
 
-	// decode
 	decode();
+	incrementBlocksDecoded();
 
-	for(int i = 0; i < params.nBlocks; i++) {
-		printf("----- block %d -----\n", i);
-		blocks[i].print();	// debug
-	}
+//	for(int i = 0; i < params.nBlocks; i++) {
+//		printf("----- block %d -----\n", i);
+//		blocks[i].print();	// debug
+//	}
 
-	// tabulate errors
-
-	// update convergence criteria
-	converged = true;	// debug
+	countErrors();
+	updateConverged();
 }
 
-void StaircaseCodeNS::StaircaseCode::nextIteration(
+void StaircaseCodeNS::StaircaseCode::incrementBlocksDecoded(void) {
+	++nBlocksDecoded;
+}
+
+void StaircaseCodeNS::StaircaseCode::nextBlock(
 		const NoiseGeneratorNS::NoiseGenerator& ng) {
-	// sample noise for last (new block), pop_front + push_back
+	// pop decoded block
+	blocks.pop_front();
 
-	// decode
+	// sample noise
+	uint32_t nSamples = params.nBlockBits;	// one block
+	std::vector<uint32_t> noise;
+	ng.generate(nSamples, noise);
 
-	// tabulate errors
+	// populate new block with noise
+	Block newBlock;
+	for(uint32_t e : noise) {
+		/*
+		 * blocks are populated from noise array
+		 * row-by-row, left-to-right in each row
+		 *
+		 */
+		int rowInd = (e % params.nBlockBits) / params.width;
+		int colInd = (e % params.nBlockBits) % params.width;
+		newBlock.rowErrPos[rowInd].push_back(colInd);
+		newBlock.colErrPos[colInd].push_back(rowInd);
+	}
 
-	// update convergence criteria
+	// push into blocks
+	blocks.push_back(newBlock);
 
-	// (clearly the last 2 functions can be combined)
+//	for(int i = 0; i < params.nBlocks; i++) {
+//		printf("----- block %d -----\n", i);
+//		blocks[i].print();	// debug
+//	}
+
+	decode();
+	incrementBlocksDecoded();
+
+//	for(int i = 0; i < params.nBlocks; i++) {
+//		printf("----- block %d -----\n", i);
+//		blocks[i].print();	// debug
+//	}
+
+	countErrors();
+	updateConverged();
+}
+
+void StaircaseCodeNS::StaircaseCode::resetErrorCounters() {
+	nBlocksDecoded = 0;
+	nBitErrors = 0;
+	nBlockErrors = 0;
+	ber = 0.0;
+	bker = 0.0;
+}
+
+void StaircaseCodeNS::StaircaseCode::countErrors() {
+	std::vector<std::vector<int>> &rowErrors = blocks.front().rowErrPos;	// get errors in 1st block
+	if(!rowErrors.empty()) {
+		++nBlockErrors;
+		for(auto iter = rowErrors.begin(); iter != rowErrors.end(); iter++) {
+			nBitErrors += iter->size();
+		}
+	}
+
+	printf("%lu blocks decoded, %u %u %1.3f %1.3f\n",
+			nBlocksDecoded, nBitErrors, nBlockErrors, ber, bker);	// debuggin only
+}
+
+void StaircaseCodeNS::StaircaseCode::updateConverged() {
+//	converged = true;	// debug
+	converged = (nBlocksDecoded >= simParams.blocksMax) ||			// max blocks reached
+				(nBlockErrors >= simParams.blocksMin);				// min block errors reached
 }
 
 static std::vector<int> emptyVec;
-
 void StaircaseCodeNS::StaircaseCode::decode(void) {
 	for (int iter = 0; iter < params.maxIters; iter++) {
 		// decode blocks [0, .., params.nBlocks - 2]

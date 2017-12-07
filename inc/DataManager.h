@@ -15,8 +15,8 @@ class DataManager {
 	NoiseGeneratorNS::Type ngType = NoiseGeneratorNS::NONE;
 	ComponentCodeNS::Params ccParams;
 	StaircaseCodeNS::Params scParams;
-	Params simParams;
-	Results results;
+	SimulationNS::Params simParams;
+	SimulationNS::Results results;
 
 public:
 	DataManager();
@@ -47,7 +47,7 @@ public:
 		return scParams;
 	}
 
-	const Params &getSimulationParams(void) const {
+	const SimulationNS::Params &getSimulationParams(void) const {
 		return simParams;
 	}
 
@@ -56,7 +56,7 @@ public:
 		results.bker = _bker;
 	}
 
-	const Results &getResults(void) const {
+	const SimulationNS::Results &getResults(void) const {
 		return results;
 	}
 };

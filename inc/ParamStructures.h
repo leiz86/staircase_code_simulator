@@ -107,13 +107,14 @@ struct Params {
 
 }
 
+namespace SimulationNS {
 /* simulation parameters */
 struct Params {
 	double pMin;
 	double pMax;
 	double pStep;
-	int blocksMin;
-	int blocksMax;
+	uint32_t blocksMin;
+	uint32_t blocksMax;
 
 	Params() :
 		pMin(0.0),
@@ -144,5 +145,6 @@ struct Results {
 
 	}
 };
+}
 
 #endif /* INC_PARAMSTRUCTURES_H_ */
