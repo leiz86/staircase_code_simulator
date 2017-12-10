@@ -44,15 +44,7 @@ int StaircaseSimulator::run(int state) {
 //	for(int i = 0; i < (int)p.size(); i++) {printf("%1.4f ", p[i]);}	// debugging
 //	printf("] (%lu entries)\n", p.size());	// debugging
 
-	std::vector<double> ber;
-	std::vector<double> bker;
-	for(double _p : p) {
-		double _ber, _bker;
-		runAtChannel(_p, _ber, _bker);
-		ber.push_back(_ber);
-		bker.push_back(_bker);
-	}
-
+	for(double _p : p) { runAtChannel(_p); }
 	return 0;
 }
 
@@ -64,10 +56,10 @@ int StaircaseSimulator::run(int state) {
  * bker, average block error
  *
  */
-void StaircaseSimulator::runAtChannel(double p, double &ber, double &bker) {
+void StaircaseSimulator::runAtChannel(double p) {
 	// set noise generator
 	ng.setChannelParam(p);
-
+	printf("----- simulating at p=%02.4e -----\n", p);
 
 	// get staircase code
 	StaircaseCodeNS::StaircaseCode sc;
@@ -80,6 +72,7 @@ void StaircaseSimulator::runAtChannel(double p, double &ber, double &bker) {
 
 	// set results
 	dm.setResults(sc.getBER(), sc.getBKER());
+	printf("ber %02.4e, bker %02.4e\n", sc.getBER(), sc.getBKER());
 }
 
 int StaircaseSimulator::report(int type) {

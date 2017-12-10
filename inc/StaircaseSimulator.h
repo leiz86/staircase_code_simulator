@@ -23,7 +23,7 @@ class StaircaseSimulator {
 	StaircaseSimulator(StaircaseSimulator &) = default;
 	StaircaseSimulator & operator=(StaircaseSimulator &) = default;
 
-	void runAtChannel(double p, double &ber, double &bker);
+	void runAtChannel(double p);
 
 public:
 	virtual ~StaircaseSimulator();

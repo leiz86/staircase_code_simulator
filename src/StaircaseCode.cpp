@@ -45,41 +45,7 @@ void StaircaseCodeNS::StaircaseCode::firstBlocks(
 		const NoiseGeneratorNS::NoiseGenerator& ng) {
 	// reset counters at new channel parameter
 	resetErrorCounters();
-
-	// sample noise
-	uint32_t nSamples = params.nTotalBits - params.nBlockBits;	// all except first block, which is not transmitted
-	std::vector<uint32_t> noise;
-	ng.generate(nSamples, noise);
-
-	// populate blocks with noise
-	for(uint32_t e : noise) {
-		int blockInd = e / params.nBlockBits + 1;	// +1 to skip first block
-		/*
-		 * blocks are populated from noise array
-		 * row-by-row, left-to-right in each row
-		 *
-		 */
-		int rowInd = (e % params.nBlockBits) / params.width;
-		int colInd = (e % params.nBlockBits) % params.width;
-		blocks[blockInd].rowErrPos[rowInd].push_back(colInd);
-		blocks[blockInd].colErrPos[colInd].push_back(rowInd);
-	}
-
-//	for(int i = 0; i < params.nBlocks; i++) {
-//		printf("----- block %d -----\n", i);
-//		blocks[i].print();	// debug
-//	}
-
-	decode();
-	incrementBlocksDecoded();
-
-//	for(int i = 0; i < params.nBlocks; i++) {
-//		printf("----- block %d -----\n", i);
-//		blocks[i].print();	// debug
-//	}
-
-	countErrors();
-	updateConverged();
+	nextBlock(ng);
 }
 
 void StaircaseCodeNS::StaircaseCode::incrementBlocksDecoded(void) {
@@ -168,13 +134,13 @@ void StaircaseCodeNS::StaircaseCode::updateConverged() {
 				(nTotalBlockErrors >= simParams.blocksMin);				// min block errors reached
 }
 
-static void printErrorVector(std::vector<int> &vec, const char *vecName) {
-	printf("%s [", vecName);
-	for(int i = 0; i < (int)vec.size(); i++) {
-		printf("%d ", vec[i]);
-	}
-	printf("] (%lu)\n", vec.size());
-}
+//static void printErrorVector(std::vector<int> &vec, const char *vecName) {	// debugging
+//	printf("%s [", vecName);
+//	for(int i = 0; i < (int)vec.size(); i++) {
+//		printf("%d ", vec[i]);
+//	}
+//	printf("] (%lu)\n", vec.size());
+//}
 
 static std::vector<int> emptyVec;
 void StaircaseCodeNS::StaircaseCode::decode(void) {
