@@ -8,6 +8,8 @@
 #ifndef INC_DATAMANAGER_H_
 #define INC_DATAMANAGER_H_
 
+#include <vector>
+
 #include "ParamStructures.h"
 #include "NoiseGenerator.h"
 
@@ -16,7 +18,8 @@ class DataManager {
 	ComponentCodeNS::Params ccParams;
 	StaircaseCodeNS::Params scParams;
 	SimulationNS::Params simParams;
-	SimulationNS::Results results;
+	std::vector<double> channelParams;
+	std::vector<SimulationNS::Result> results;
 
 public:
 	DataManager();
@@ -51,12 +54,15 @@ public:
 		return simParams;
 	}
 
-	void setResults(double _ber, double _bker) {
-		results.ber = _ber;
-		results.bker = _bker;
+	const std::vector<double> &getChannelParameters(void) const {
+		return channelParams;
 	}
 
-	const SimulationNS::Results &getResults(void) const {
+	void setResults(double _ber, double _bker) {
+		results.push_back(SimulationNS::Result(_ber, _bker));
+	}
+
+	const std::vector<SimulationNS::Result> &getResults(void) const {
 		return results;
 	}
 };

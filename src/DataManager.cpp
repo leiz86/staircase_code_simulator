@@ -16,6 +16,17 @@ DataManager::DataManager(){
 DataManager::~DataManager() {
 }
 
+
+static std::vector<double> setChannelParameters(double m, double M, double s) {
+	std::vector<double> pArray;
+	double p = m;
+	while (p < M + s) {	// to avoid numerical inaccuracy around M and losing M
+		pArray.push_back(p);
+		p += s;
+	}
+	return pArray;
+}
+
 int DataManager::init(const char* opts) {
 	// todo: implement parsing and remove defaults
 
@@ -39,7 +50,10 @@ int DataManager::init(const char* opts) {
 	}
 
 	// set simulation parameters
-	simParams = SimulationNS::Params(0.2, 0.2, 0.01, 10, 100);
+	simParams = SimulationNS::Params(0.004, 0.006, 0.0002, 20, 100);
+
+	// set channel parameters
+	channelParams = setChannelParameters(simParams.pMin, simParams.pMax, simParams.pStep);
 
 	return 0;
 }

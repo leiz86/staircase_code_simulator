@@ -17,7 +17,6 @@
 class StaircaseSimulator {
 	DataManager dm;
 	NoiseGeneratorNS::NoiseGenerator ng;
-	StaircaseCodeNS::StaircaseCode sc;
 
 	// make private, as singleton
 	StaircaseSimulator();

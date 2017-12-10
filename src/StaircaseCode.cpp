@@ -98,6 +98,10 @@ void StaircaseCodeNS::StaircaseCode::nextBlock(
 
 	// populate new block with noise
 	Block newBlock;
+	for(int i = 0; i < params.width; i++) {
+		newBlock.rowErrPos.push_back(std::vector<int>());
+		newBlock.colErrPos.push_back(std::vector<int>());
+	}
 	for(uint32_t e : noise) {
 		/*
 		 * blocks are populated from noise array
@@ -146,6 +150,9 @@ void StaircaseCodeNS::StaircaseCode::countErrors() {
 			nBitErrors += iter->size();
 		}
 	}
+
+	ber = static_cast<double>(nBitErrors) / static_cast<double>(nBlocksDecoded * params.width * params.width);
+	bker = static_cast<double>(nBlockErrors) / static_cast<double>(nBlocksDecoded);
 
 	printf("%lu blocks decoded, %u %u %1.3f %1.3f\n",
 			nBlocksDecoded, nBitErrors, nBlockErrors, ber, bker);	// debuggin only

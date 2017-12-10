@@ -135,15 +135,16 @@ struct Params {
 };
 
 /* simulation results */
-struct Results {
+struct Result {
 	double ber;
 	double bker;
 
-	Results() :
+	Result() :
 		ber(0.0),
-		bker(0.0) {
-
-	}
+		bker(0.0) {};
+	Result(double _b, double _bk) :
+		ber(_b),
+		bker(_bk) {};
 };
 }
 
