@@ -136,97 +136,125 @@ void StaircaseCodeNS::StaircaseCode::nextBlock(
 
 void StaircaseCodeNS::StaircaseCode::resetErrorCounters() {
 	nBlocksDecoded = 0;
-	nBitErrors = 0;
-	nBlockErrors = 0;
+	nTotalBitErrors = 0;
+	nTotalBlockErrors = 0;
 	ber = 0.0;
 	bker = 0.0;
 }
 
 void StaircaseCodeNS::StaircaseCode::countErrors() {
 	std::vector<std::vector<int>> &rowErrors = blocks.front().rowErrPos;	// get errors in 1st block
-	if(!rowErrors.empty()) {
-		++nBlockErrors;
-		for(auto iter = rowErrors.begin(); iter != rowErrors.end(); iter++) {
-			nBitErrors += iter->size();
-		}
+	unsigned int errors = 0;
+	for (auto iter = rowErrors.begin(); iter != rowErrors.end(); iter++) {
+		errors += iter->size();
+	}
+	if(errors > 0) {
+		++nTotalBlockErrors;
+		nTotalBitErrors += errors;
 	}
 
-	ber = static_cast<double>(nBitErrors) / static_cast<double>(nBlocksDecoded * params.width * params.width);
-	bker = static_cast<double>(nBlockErrors) / static_cast<double>(nBlocksDecoded);
+	ber = static_cast<double>(nTotalBitErrors) / static_cast<double>(nBlocksDecoded * params.width * params.width);
+	bker = static_cast<double>(nTotalBlockErrors) / static_cast<double>(nBlocksDecoded);
 
-	printf("%lu blocks decoded, %u %u %1.3f %1.3f\n",
-			nBlocksDecoded, nBitErrors, nBlockErrors, ber, bker);	// debuggin only
+	if(nBlocksDecoded % params.reportInterval == 0) {
+		printf("%lu blocks decoded, %u %u %02.4e %02.4e\n",
+				nBlocksDecoded, nTotalBitErrors, nTotalBlockErrors, ber, bker);
+	}
 }
 
 void StaircaseCodeNS::StaircaseCode::updateConverged() {
 //	converged = true;	// debug
 	converged = (nBlocksDecoded >= simParams.blocksMax) ||			// max blocks reached
-				(nBlockErrors >= simParams.blocksMin);				// min block errors reached
+				(nTotalBlockErrors >= simParams.blocksMin);				// min block errors reached
+}
+
+static void printErrorVector(std::vector<int> &vec, const char *vecName) {
+	printf("%s [", vecName);
+	for(int i = 0; i < (int)vec.size(); i++) {
+		printf("%d ", vec[i]);
+	}
+	printf("] (%lu)\n", vec.size());
 }
 
 static std::vector<int> emptyVec;
 void StaircaseCodeNS::StaircaseCode::decode(void) {
-	for (int iter = 0; iter < params.maxIters; iter++) {
+	for (int iteration = 0; iteration < params.maxIters; iteration++) {
+//		printf("iteration: %d\n", iteration);	// debugging
+
 		// decode blocks [0, .., params.nBlocks - 2]
 		for (int blkInd = 0; blkInd < (int) params.nBlocks - 1; blkInd++) {
 			for (int codeInd = 0; codeInd < (int) params.width; codeInd++) {
+//				printf("blkInd, codeInd: %d, %d\n", blkInd, codeInd);	// debugging
+
 				// get error positions on left and right of component code
 				// note: right error positions have NOT been adjusted by params.width
 				std::vector<int> &left = getLeftErrorVector(blkInd, codeInd);
 				std::vector<int> &right = getRightErrorVector(blkInd, codeInd);	// not adjusted, yet
 
+//				printErrorVector(left, "left");	// debugging
+//				printErrorVector(right, "right");	// debugging
+
 				uint16_t nErrors = 0;
 				nErrors = left.size() + right.size();
-				if(nErrors <= cc.getParams().t) {
+				if (nErrors <= cc.getParams().t) {
 					// guaranteed correction, remove all errors
-					updateErrors(blkInd, codeInd, left, emptyVec, isDecodeRows(blkInd));
-					updateErrors(blkInd + 1, codeInd, right, emptyVec, isDecodeRows(blkInd));
-				}
-				else {
+					updateErrors(blkInd, codeInd, left, emptyVec,
+							isDecodeRows(blkInd));
+					updateErrors(blkInd + 1, codeInd, right, emptyVec,
+							isDecodeRows(blkInd));
+				} else {
 					std::vector<int> errorLocs;
-					for(int &le : left) {		// add left errors
+					for (int &le : left) {		// add left errors
 						errorLocs.push_back(le);
 					}
-					for(int &re : right) {
+					for (int &re : right) {
 						errorLocs.push_back(params.width + re);	//	add right errors, with width offset
 					}
-
 					std::vector<int> flipLocs;
 					int nDec = cc.decode(errorLocs, flipLocs);
-					if(nDec >= 1) {
+					if (nDec >= 1) {
 						// bit flips occurred, first, removed errors if any
-						for(auto iter = errorLocs.begin(); iter != errorLocs.end(); ) {
-							auto iter2 = std::find(flipLocs.begin(), flipLocs.end(), *iter);
-							if(iter2 != flipLocs.end()) {
+						for (auto iter = errorLocs.begin();
+								iter != errorLocs.end();) {
+							auto iter2 = std::find(flipLocs.begin(),
+									flipLocs.end(), *iter);
+							if (iter2 != flipLocs.end()) {
 								// error is in flip list, remove from both
 								iter = errorLocs.erase(iter);
 								flipLocs.erase(iter2);
+							} else {
+								++iter;
 							}
 						}
 
 						// add new errors, if any
-						if(!flipLocs.empty()) {
-							for(auto iter = flipLocs.begin(); iter != flipLocs.end(); ) {
+						if (!flipLocs.empty()) {
+							for (auto iter = flipLocs.begin();
+									iter != flipLocs.end();) {
 								errorLocs.push_back(*iter);
 								iter = flipLocs.erase(iter);
 							}
 						}
 						assert(flipLocs.size() == 0);
-
 						// populate new left and right errors after decoding
 						std::vector<int> leftNew;
 						std::vector<int> rightNew;
-						for(int &e : errorLocs) {
-							if(e < params.width) {
+						for (int &e : errorLocs) {
+							if (e < params.width) {
 								leftNew.push_back(e);		// add left errors
 							} else {
-								rightNew.push_back(e - params.width);	// add right errors, without width offset
+								rightNew.push_back(e - params.width);// add right errors, without width offset
 							}
 						}
 
+//						printErrorVector(leftNew, "new left");	// debugging
+//						printErrorVector(rightNew, "new right");	// debugging
+
 						// update (remove or add) errors
-						updateErrors(blkInd, codeInd, left, leftNew, isDecodeRows(blkInd));
-						updateErrors(blkInd + 1, codeInd, right, rightNew, isDecodeRows(blkInd));
+						updateErrors(blkInd, codeInd, left, leftNew,
+								isDecodeRows(blkInd));
+						updateErrors(blkInd + 1, codeInd, right, rightNew,
+								isDecodeRows(blkInd));
 					}
 				}
 			} /* codes loop */
@@ -298,8 +326,8 @@ void StaircaseCodeNS::StaircaseCode::updateErrors(const int blkInd,
 
 	// add new errors, if any
 	for (auto iterNew = vecNew.begin(); iterNew != vecNew.end();) {
-		addErrorToBlock(blkInd, codeInd, *iterNew, decodeRows);
 		vecOld.push_back(*iterNew);
+		addErrorToBlock(blkInd, codeInd, *iterNew, decodeRows);
 		vecNew.erase(iterNew);
 	}
 //	printf(
@@ -307,6 +335,12 @@ void StaircaseCodeNS::StaircaseCode::updateErrors(const int blkInd,
 //			blkInd, codeInd, decodeRows, vecOld.size(), vecNew.size());
 }
 
+/**
+ * remove error from the transposed representation
+ * of errors in the block, i.e.,
+ * if called from rows, column errors are removed, and vice versa
+ *
+ */
 void StaircaseCodeNS::StaircaseCode::removeErrorFromBlock(const int blkInd,
 		const int codeInd, const int e, bool decodeRows) {
 //	printf("inside remove error, %d %d %d %d\n", blkInd, codeInd, e, decodeRows);
@@ -334,9 +368,9 @@ void StaircaseCodeNS::StaircaseCode::addErrorToBlock(const int blkInd,
 		const int codeInd, const int e, bool decodeRows) {
 //	printf("inside add error, %d %d %d %d\n", blkInd, codeInd, e, decodeRows);
 	if (decodeRows) {
-		blocks[blkInd].rowErrPos[codeInd].push_back(e);
+		blocks[blkInd].colErrPos[e].push_back(codeInd);
 	} else {
-		blocks[blkInd].colErrPos[codeInd].push_back(e);
+		blocks[blkInd].rowErrPos[e].push_back(codeInd);
 	}
 //	printf("leaving add error\n");
 }

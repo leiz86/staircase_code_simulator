@@ -43,6 +43,11 @@ int ComponentCodeNS::ComponentCode::decode(const std::vector<int>& locs,
 		return ret;
 	}
 
+	if (p1 >= params.n || p2 >= params.n || p3 >= params.n) {
+		// bit flip in shortened bits, detected mis-correction
+		return -1;
+	}
+
 	if(ret >= 1) {
 		decLocs.push_back(p1);
 	}

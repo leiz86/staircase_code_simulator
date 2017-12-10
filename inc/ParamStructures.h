@@ -82,6 +82,7 @@ struct Params {
 
 	uint32_t nBlockBits;
 	uint32_t nTotalBits;
+	uint32_t reportInterval = 10;
 
 	bool isValid = false;
 
@@ -90,7 +91,7 @@ struct Params {
 		nBlocks(0),
 		maxIters(0),
 		nBlockBits(0),
-		nTotalBits(0) {
+		nTotalBits(0){
 	}
 
 	Params(const int _w, const int _nb, const int _mi) :
@@ -103,6 +104,7 @@ struct Params {
 	}
 
 	bool validateParams(void);
+	void setReportInterval(int ri);
 };
 
 }
@@ -115,6 +117,7 @@ struct Params {
 	double pStep;
 	uint32_t blocksMin;
 	uint32_t blocksMax;
+	uint32_t reportInterval = 10;
 
 	Params() :
 		pMin(0.0),
@@ -124,12 +127,13 @@ struct Params {
 		blocksMax(0) {
 	}
 
-	Params(double _pMin, double _pMax, double _pStep, int _blocksMin, int _blocksMax) :
+	Params(double _pMin, double _pMax, double _pStep, int _blocksMin, int _blocksMax, uint32_t _ri) :
 		pMin(_pMin),
 		pMax(_pMax),
 		pStep(_pStep),
 		blocksMin(_blocksMin),
-		blocksMax(_blocksMax) {
+		blocksMax(_blocksMax),
+		reportInterval(_ri){
 
 	}
 };

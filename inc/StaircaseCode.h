@@ -52,8 +52,8 @@ class StaircaseCode {
 	std::deque<Block> blocks;
 
 	uint64_t nBlocksDecoded = 0;
-	uint32_t nBitErrors = 0;
-	uint32_t nBlockErrors = 0;
+	uint32_t nTotalBitErrors = 0;
+	uint32_t nTotalBlockErrors = 0;
 
 	double ber;
 	double bker;

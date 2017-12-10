@@ -37,3 +37,7 @@ std::string ComponentCodeNS::Params::ToString(void) {
 			nC, kC, n, k, s, m, d, t);
 	return std::string(buffer);
 }
+
+void StaircaseCodeNS::Params::setReportInterval(int ri) {
+	reportInterval = ri;
+}
