@@ -1,22 +1,20 @@
 /*
- * StaircaseSimulator_test.cpp
+ * StaircaseSimulator_main.cpp
  *
- *  Created on: Nov 26, 2017
+ *  Created on: Dec 10, 2017
  *      Author: leizhang
  */
 
 #include "StaircaseSimulator.h"
-#include "gtest/gtest.h"
-
-TEST(stairSim, run) {
-	StaircaseSimulator & scs = StaircaseSimulator::GetInstance();
-	const char testOpts[] = "test";
-	scs.init(testOpts);
-	scs.run(0);
-	scs.report(0);
-}
 
 int main(int argc, char **argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	StaircaseSimulator & scs = StaircaseSimulator::GetInstance();
+
+	const char testOpts[] = "test";
+	scs.init(testOpts);
+
+	scs.run(0);
+	scs.report(0);
+
+	return 0;
 }

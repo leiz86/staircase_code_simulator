@@ -182,23 +182,56 @@ void StaircaseCodeNS::StaircaseCode::decode(void) {
 					updateErrors(blkInd, codeInd, left, emptyVec, isDecodeRows(blkInd));
 					updateErrors(blkInd + 1, codeInd, right, emptyVec, isDecodeRows(blkInd));
 				}
-				// todo: use syndrome decoder
-//				else {
-//					// call decoder
-//
-//
-//					std::vector<int> leftNew;
-//					std::vector<int> rightNew;
-//					// update (remove or add) errors
-//					updateErrors(blkInd, codeInd, left, leftNew, isDecodeRows(blkInd));
-//					updateErrors(blkInd + 1, codeInd, right, rightNew, isDecodeRows(blkInd));
-//				}
+				else {
+					std::vector<int> errorLocs;
+					for(int &le : left) {		// add left errors
+						errorLocs.push_back(le);
+					}
+					for(int &re : right) {
+						errorLocs.push_back(params.width + re);	//	add right errors, with width offset
+					}
+
+					std::vector<int> flipLocs;
+					int nDec = cc.decode(errorLocs, flipLocs);
+					if(nDec >= 1) {
+						// bit flips occurred, first, removed errors if any
+						for(auto iter = errorLocs.begin(); iter != errorLocs.end(); ) {
+							auto iter2 = std::find(flipLocs.begin(), flipLocs.end(), *iter);
+							if(iter2 != flipLocs.end()) {
+								// error is in flip list, remove from both
+								iter = errorLocs.erase(iter);
+								flipLocs.erase(iter2);
+							}
+						}
+
+						// add new errors, if any
+						if(!flipLocs.empty()) {
+							for(auto iter = flipLocs.begin(); iter != flipLocs.end(); ) {
+								errorLocs.push_back(*iter);
+								iter = flipLocs.erase(iter);
+							}
+						}
+						assert(flipLocs.size() == 0);
+
+						// populate new left and right errors after decoding
+						std::vector<int> leftNew;
+						std::vector<int> rightNew;
+						for(int &e : errorLocs) {
+							if(e < params.width) {
+								leftNew.push_back(e);		// add left errors
+							} else {
+								rightNew.push_back(e - params.width);	// add right errors, without width offset
+							}
+						}
+
+						// update (remove or add) errors
+						updateErrors(blkInd, codeInd, left, leftNew, isDecodeRows(blkInd));
+						updateErrors(blkInd + 1, codeInd, right, rightNew, isDecodeRows(blkInd));
+					}
+				}
 			} /* codes loop */
 		} /* blocks loop */
-
-		// todo: early termination
 	}
-
 }
 
 std::vector<int> & StaircaseCodeNS::StaircaseCode::getLeftErrorVector(int blkInd, int codeInd) {
