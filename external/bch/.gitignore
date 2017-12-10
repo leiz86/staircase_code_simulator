@@ -1,4 +1,5 @@
-/Linux_Shared/
 .settings/
 .cproject
 .project
+src/
+test/
