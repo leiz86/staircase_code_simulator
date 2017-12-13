@@ -18,6 +18,8 @@ class StaircaseSimulator {
 	DataManager dm;
 	NoiseGeneratorNS::NoiseGenerator ng;
 
+	const std::string REPORT_FILE_LOC = "./staircase_sim_report";
+
 	// make private, as singleton
 	StaircaseSimulator();
 	StaircaseSimulator(StaircaseSimulator &) = default;

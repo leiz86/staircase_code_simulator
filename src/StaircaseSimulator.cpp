@@ -6,6 +6,8 @@
  */
 
 #include <cstdio>
+#include <fstream>
+#include <cstring>
 
 #include "StaircaseSimulator.h"
 #include "ParamStructures.h"
@@ -88,7 +90,20 @@ int StaircaseSimulator::report(int type) {
 		}
 		printf("----- end simulation results -----\n");
 	} else if (type == 1) {
-		// todo: save report to file
+		std::ofstream fout(REPORT_FILE_LOC.c_str());
+		if(!fout.is_open()) {
+			printf("SC ERR: report: cannot open file to write report\n");
+			return -1;
+		}
+		fout << "p, " << "BER, " << "BKER" << std::endl;
+		for(int i = 0; i < (int)p.size(); i++) {
+			char buff[100];
+			memset(buff, 0, 100);
+			sprintf(buff, "%02.4e, %02.4e, %02.4e",
+					p[i], results[i].ber, results[i].bker);
+			fout << std::string(buff) << std::endl;
+		}
+		fout.close();
 	}
 
 	return 0;

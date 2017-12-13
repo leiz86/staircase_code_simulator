@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	scs.init(testOpts);
 
 	scs.run(0);
-	scs.report(0);
+	scs.report(1);
 
 	return 0;
 }
