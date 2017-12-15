@@ -50,7 +50,7 @@ int DataManager::init(const char* opts) {
 	}
 
 	// set simulation parameters
-	simParams = SimulationNS::Params(0.0057, 0.0060, 5e-5, 100, 10000, 1000);
+	simParams = SimulationNS::Params(0.0055, 0.0057, 2e-5, 1000, 1e5, 1000);
 	scParams.setReportInterval(simParams.reportInterval);
 
 	// set channel parameters
